@@ -28,9 +28,9 @@ namespace Test {
 			}
 
 			public string Hello(string name) {
-				Inc("id");
+				Data.Inc("id");
 				Console.WriteLine(string.Format("{0} {1}",Data["id"], name));
-				if (GetInt("id", 0) >= 3)
+				if (Data.GetInt("id", 0) >= 3)
 					return "done";
 				return "";
 			}
