@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ZSM{
 
-	public delegate void DFSMEvent(FSM fms, string method, object[] args);
+	public delegate void DFSMEvent(FSM fms, string eventName, object[] args);
 
 	public class FSM {
 
@@ -40,6 +40,14 @@ namespace ZSM{
 				this.events.Remove(eventName);
 		}
 
+		public void Event(string eventName, params object[] args){
+			if (this.events.ContainsKey(eventName))
+				foreach (DFSMEvent target in this.events[eventName])
+					target.Invoke(this, eventName, args);
+			if (this.events.ContainsKey("*"))
+				foreach (DFSMEvent target in this.events["*"])
+					target.Invoke(this, eventName, args);
+		}
 
 		public void Add(string name, IState state) {
 			state.Parent = this;
