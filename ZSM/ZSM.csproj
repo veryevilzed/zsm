@@ -34,5 +34,6 @@
     <Compile Include="FSM.cs" />
     <Compile Include="Route.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="State.cs" />
   </ItemGroup>
 </Project>
