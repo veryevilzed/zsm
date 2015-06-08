@@ -24,6 +24,7 @@ namespace Test {
 
 			public override string Enter(params object[] args) {
 				Console.WriteLine("Ready");
+				this.Parent.Event("state", "ready");
 				return base.Enter(args);
 			}
 
@@ -43,13 +44,19 @@ namespace Test {
 
 			public override string Enter(params object[] args) {
 				Console.WriteLine("Done");
+				this.Parent.Event("log", "ok");
 				return base.Enter(args);
 			}
 
 			public DoneState() : base(){}
 		}
 
-
+		public class EventFromFSM {
+			[FSMEvent("log", "state")]
+			public void Log(FSM fms, string eventName, object[] args){
+				Console.WriteLine("Event from FSM!! {0} {1}", eventName, args[0]);
+			}
+		}
 
 		public static void Main(string[] args) {
 
@@ -57,6 +64,9 @@ namespace Test {
 			fsm.Add(new InitState());
 			fsm.Add(new ReadyState());
 			fsm.Add(new DoneState());
+
+			fsm.AddEvents(new EventFromFSM());
+
 			fsm.StrtState("init");
 
 			fsm.Do("Hello", "World");

@@ -1,10 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace ZSM{
 
 	public delegate void DFSMEvent(FSM fms, string eventName, object[] args);
+
+	[AttributeUsage(AttributeTargets.Method)]
+	public class FSMEvent : System.Attribute {
+		public string[] EventNames { get; protected set; }
+		public FSMEvent(params string[] eventNames){
+			this.EventNames = eventNames;
+		}
+	}
 
 	public class FSM {
 
@@ -22,6 +31,19 @@ namespace ZSM{
 			}
 
 			this.Add(state.GetType().Name, state);
+		}
+
+		public void AddEvents(object fromTarget){
+			
+			foreach (System.Reflection.MethodInfo mi in fromTarget.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)) {
+				foreach (object o in mi.GetCustomAttributes(true)) {
+					if (o.GetType() == typeof(FSMEvent)) {
+						foreach (string eventName in ((FSMEvent)o).EventNames) {
+							this.AddEvent(eventName, (DFSMEvent)Delegate.CreateDelegate(typeof(DFSMEvent), fromTarget, mi, true));
+						}
+					}
+				}
+			}
 		}
 
 		public void AddEvent(string eventName, DFSMEvent target){
