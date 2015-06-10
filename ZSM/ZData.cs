@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace ZSM {
 
@@ -55,6 +56,24 @@ namespace ZSM {
 		}
 
 		#region helper
+
+		public T GetOrCreate<T>(string name, params object[] createArgs) {
+			if (this.data.ContainsKey(name))
+				return (T)data[name];
+
+			List<Type> types = new List<Type>();
+			foreach (object o in createArgs)
+				types.Add(o.GetType());
+
+			ConstructorInfo ci = typeof(T).GetConstructor(types.ToArray());
+			if (ci != null){
+					T res = (T)ci.Invoke(createArgs);
+					this.Set(name, res);
+					return res;
+			}
+			return default(T);
+
+		}
 
 		public int GetInt(string name){
 			return GetInt(name, 0);

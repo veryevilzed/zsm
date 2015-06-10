@@ -58,6 +58,26 @@ namespace Test {
 			}
 		}
 
+		public class Test1 {
+			public string Name { get; set; }
+
+			public override string ToString() {
+				return string.Format("[Test1: Name={0}]", Name);
+			}
+
+			public Test1(string name){
+				this.Name = name;
+			}
+
+			public Test1(int name){
+				this.Name = "INT:"+ name.ToString();
+			}
+
+			public Test1(){
+				this.Name = "default";
+			}
+		}
+
 		public static void Main2(string[] args) {
 
 			ZSM.FSM fsm = new ZSM.FSM();
@@ -90,7 +110,12 @@ namespace Test {
 			ZData data = new ZData();
 			data.EventManager.AddEvent("change.A", DDD);
 
-			data.Set("A", 5);
+			Test1 t = data.GetOrCreate<Test1>("test", 7);
+			Console.WriteLine(t.ToString());
+			t = data.GetOrCreate<Test1>("test", 14);
+			Console.WriteLine(t.ToString());
+
+
 			data.Set("B", 15);
 			data.Inc("A");
 			data.Set("A", null);
