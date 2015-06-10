@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ZSM {
 	public interface IState {
 		FSM Parent { get; set; }
-		FSMData Data { get; }
+		ZData Data { get; }
 		string Enter(params object[] args);
 		string Do(params object[] args);
 		string Exit(params object[] args);
@@ -14,7 +14,7 @@ namespace ZSM {
 
 		public FSM Parent { get; set; }
 
-		public FSMData Data { get; protected set; }
+		public ZData Data { get; protected set; }
 
 		public virtual string Enter(params object[] args) {
 			return "";
@@ -29,11 +29,11 @@ namespace ZSM {
 		}
 
 		public State() {
-			Data = new FSMData();
+			Data = new ZData();
 		}
 
 		public State(Dictionary<string, object> data) {
-			Data = new FSMData(data);
+			Data = new ZData(data);
 		}
 	}
 
@@ -41,9 +41,7 @@ namespace ZSM {
 
 		private Route route;
 		public FSM Parent {get; set; }
-		public FSMData Data { get; protected set; }
-
-
+		public ZData Data { get; protected set; }
 
 		public virtual string Enter(params object[] args) {
 			return "";
@@ -62,7 +60,7 @@ namespace ZSM {
 		public SmartState():this(new Dictionary<string, object>()) {}
 
 		public SmartState(Dictionary<string, object> data) {
-			Data = new FSMData(data);
+			Data = new ZData(data);
 			route = new Route(this);
 		}
 	}

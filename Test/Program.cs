@@ -24,7 +24,7 @@ namespace Test {
 
 			public override string Enter(params object[] args) {
 				Console.WriteLine("Ready");
-				this.Parent.Event("state", "ready");
+				this.Parent.Invoke("state", "ready");
 				return base.Enter(args);
 			}
 
@@ -44,7 +44,7 @@ namespace Test {
 
 			public override string Enter(params object[] args) {
 				Console.WriteLine("Done");
-				this.Parent.Event("log", "ok");
+				this.Parent.Invoke("log", "ok");
 				return base.Enter(args);
 			}
 
@@ -77,56 +77,23 @@ namespace Test {
 			fsm.Do("Hello", "World");
 		}
 
-		static EventManager em = new EventManager();
+		//static EventManager em = new EventManager();
 
-		public static void DDD(string eventName, object sender, object[] args) {
-			Console.WriteLine("Call event *.*.c from event {0}", eventName);
+		public static void DDD(ZEventArgs _args) {
+			ZDataEventArgs args = _args.GetDataEventArgs();
+			Console.WriteLine("DataChanged Field:{0} From:{1} To:{2}", args.GetDataEventArgs().Key, args.Before, args.Value);
 		}
 
 
 		public static void Main(string[] _args) {
-		
-//			em.AddEvent("a.b.c", (string eventName, object sender, object[] args) => {
-//				Console.WriteLine("Call event a.b.c from event {0}", eventName);
-//			});
-//
-//			em.AddEvent("a.b.*", (string eventName, object sender, object[] args) => {
-//				Console.WriteLine("Call event a.b.* from event {0}", eventName);
-//			});
-//
-//			em.AddEvent("a.*.*", (string eventName, object sender, object[] args) => {
-//				Console.WriteLine("Call event a.*.* from event {0}", eventName);
-//			});
-//
-//
-//			em.AddEvent("a.*.c", (string eventName, object sender, object[] args) => {
-//				Console.WriteLine("Call event a.*.c from event {0}", eventName);
-//			});
-//
-//			em.AddEvent("a.*", (string eventName, object sender, object[] args) => {
-//				Console.WriteLine("Call event a.* from event {0}", eventName);
-//			});
 
-//			em.AddEvent("a.*.b", (string eventName, object sender, object[] args) => {
-//				Console.WriteLine("Call event a.*.b from event {0}", eventName);
-//			});
+			ZData data = new ZData();
+			data.EventManager.AddEvent("change.A", DDD);
 
-			//em.AddEvent("*.*.c", DDD);
-			em.AddEvent("a.b.c", DDD);
-
-			em.AddEvent("a.*", (string eventName, object sender, object[] args) => {
-				Console.WriteLine("Call event a.*.b from event {0}", eventName);
-			});
-
-
-			em.Invoke("a.b.c", null);
-
-			em.RemoveEvent(DDD);
-			Console.WriteLine("-----");
-			em.Invoke("a.b.c", null);
-
-
-
+			data.Set("A", 5);
+			data.Set("B", 15);
+			data.Inc("A");
+			data.Set("A", null);
 
 		}
 	}

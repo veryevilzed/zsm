@@ -5,8 +5,6 @@ using System.Reflection;
 
 namespace ZSM{
 
-	public delegate void DFSMEvent(FSM fms, string eventName, object[] args);
-
 	[AttributeUsage(AttributeTargets.Method)]
 	public class FSMEvent : System.Attribute {
 		public string[] EventNames { get; protected set; }
@@ -15,17 +13,23 @@ namespace ZSM{
 		}
 	}
 
+	public class ZFSMEventArgs : ZEventArgs {
+		public FSM FSM { get {return (FSM)this.Sender; } }
+		public ZFSMEventArgs(string eventName, FSM sender, string stateName):base(string.Format("fsm.{0}",eventName), sender, stateName) { }
+	}
+
+
 	public class FSM {
+	
+		public Dictionary<string, IState> States { get; protected set; }
 
-		private Dictionary<string, IState> states;
-		public Dictionary<string, IState> States { get { return states; } }
+		public EventManager Events {get; protected set;}
 
-		private Dictionary<string, List<DFSMEvent>> events;
-		public Dictionary<string, List<DFSMEvent>> Events {get { return events; } }
-
-		public FSMData Data {get; protected set;}
+		public ZData Data {get; protected set;}
 
 		public IState CurrentState { get; protected set; }
+
+		public string StateName {get;set;}
 
 		public void Add(IState state) {
 			foreach (object a in state.GetType().GetCustomAttributes(true)) {
@@ -44,41 +48,28 @@ namespace ZSM{
 				foreach (object o in mi.GetCustomAttributes(true)) {
 					if (o.GetType() == typeof(FSMEvent)) {
 						foreach (string eventName in ((FSMEvent)o).EventNames) {
-							this.AddEvent(eventName, (DFSMEvent)Delegate.CreateDelegate(typeof(DFSMEvent), fromTarget, mi, true));
+							this.AddEvent(eventName, (DZEvent)Delegate.CreateDelegate(typeof(DZEvent), fromTarget, mi, true));
 						}
 					}
 				}
 			}
 		}
 
-		public void AddEvent(string eventName, DFSMEvent target){
-			if (!this.events.ContainsKey(eventName))
-				this.events.Add(eventName, new List<DFSMEvent>());	
-				
-			this.events[eventName].Add(target);
-			
+		public void AddEvent(string eventName, DZEvent listener){
+			this.Events.AddEvent(string.Format("{0}", eventName), listener);
 		}
 
-		public void RemoveEvent(string eventName, DFSMEvent target){
-			if (!this.events.ContainsKey(eventName))
-				return;
-			this.events[eventName].Remove(target);
-			if (this.events[eventName].Count == 0)
-				this.events.Remove(eventName);
+		public void RemoveEvent(DZEvent listener){
+			Events.RemoveEvent(listener);
 		}
 
-		public void Event(string eventName, params object[] args){
-			if (this.events.ContainsKey(eventName))
-				foreach (DFSMEvent target in this.events[eventName])
-					target.Invoke(this, eventName, args);
-			if (this.events.ContainsKey("*"))
-				foreach (DFSMEvent target in this.events["*"])
-					target.Invoke(this, eventName, args);
+		public void Invoke(string eventName, params object[] args){
+			this.Events.Invoke(new ZEventArgs(eventName, this, args));
 		}
 
 		public void Add(string name, IState state) {
 			state.Parent = this;
-			this.states.Add(name, state);
+			this.States.Add(name, state);
 		}
 
 		public virtual void Do(params object[] args){
@@ -96,6 +87,7 @@ namespace ZSM{
 
 		protected void ExitState(string newState, params object[] args) {
 			if (CurrentState != null) {
+				this.Events.Invoke(new ZFSMEventArgs("fsm.exit", this, StateName));
 				string _newState = CurrentState.Exit(args);
 				CurrentState = null;
 				if (_newState != "")
@@ -107,7 +99,9 @@ namespace ZSM{
 		}
 
 		protected void EnterState(string newState, params object[] args) {
-			CurrentState = states[newState];
+			StateName = newState;
+			CurrentState = States[newState];
+			this.Events.Invoke(new ZFSMEventArgs("fsm.enter", this, StateName));
 			string _newState = CurrentState.Enter(args);
 			if (_newState != "")
 				ExitState(_newState, args);
@@ -121,9 +115,9 @@ namespace ZSM{
 		public FSM() : this(new System.Collections.Generic.Dictionary<string, object>()) {}
 
 		public FSM(System.Collections.Generic.Dictionary<string, object> data) {
-			states = new Dictionary<string, IState>();
-			events = new Dictionary<string, List<DFSMEvent>>();
-			Data = new FSMData(data);
+			States = new Dictionary<string, IState>();
+			Events = new EventManager();
+			Data = new ZData(data);
 		}
 
 	}

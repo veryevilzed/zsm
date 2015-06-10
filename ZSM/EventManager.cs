@@ -3,7 +3,26 @@ using System.Collections.Generic;
 
 namespace ZSM {
 
-	public delegate void DZEvent(string eventName, object sender, object[] args);
+	public delegate void DZEvent(ZEventArgs args);
+
+	public class ZEventArgs {
+		public string EventName { get; set; }
+		public object Sender { get; set; }
+		public object[] Args { get; set; }
+
+		public override string ToString(){
+			return string.Format("[ZEventArgs: EventName={0}, Sender={1}, Args={2}]", EventName, Sender, Args);
+		}
+
+		public ZEventArgs():this("") {}
+		public ZEventArgs(string eventName):this(eventName,null) {}
+
+		public ZEventArgs(string eventName, object sender, params object[] args){
+			this.EventName = eventName;
+			this.Sender = sender;
+			this.Args = args;
+		}
+	}
 
 	public class EventManager {
 
@@ -42,7 +61,7 @@ namespace ZSM {
 					Parent.RemoveEvent(this.Leaf);
 			}
 
-			public string ToString() {
+			public override string ToString() {
 				EventTree l = this;
 				string rr = "";
 				while(l.Parent != null){
@@ -54,7 +73,7 @@ namespace ZSM {
 
 			public HashSet<DZEvent> GetListeners(List<string> path, HashSet<DZEvent> res) {
 			
-				Console.WriteLine(this.ToString());
+
 
 				if (Leaf == "*" || path.Count == 0)
 					foreach(DZEvent listener in Listeners)
@@ -88,12 +107,19 @@ namespace ZSM {
 
 		private EventTree root;
 
+		public void Invoke(string eventName){
+			this.Invoke(new ZEventArgs(eventName));
+		}
+
 		public void Invoke(string eventName, object sender, params object[] args){
-			HashSet<DZEvent> listeners = root.GetListeners(new List<string>(eventName.Trim().Split('.')), new HashSet<DZEvent>());
+			this.Invoke(new ZEventArgs(eventName, sender, args));
+		}
+
+		public void Invoke(ZEventArgs args){
+			HashSet<DZEvent> listeners = root.GetListeners(new List<string>(args.EventName.Trim().Split('.')), new HashSet<DZEvent>());
 			foreach(DZEvent listener in listeners){
 				if (listener != null)
-					listener.Invoke(eventName, sender, args);
-
+					listener.Invoke(args);
 			}
 		}
 
