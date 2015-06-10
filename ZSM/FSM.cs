@@ -17,8 +17,13 @@ namespace ZSM{
 
 	public class FSM {
 
-		public Dictionary<string, IState> states;
-		public Dictionary<string, List<DFSMEvent>> events;
+		private Dictionary<string, IState> states;
+		public Dictionary<string, IState> States { get { return states; } }
+
+		private Dictionary<string, List<DFSMEvent>> events;
+		public Dictionary<string, List<DFSMEvent>> Events {get { return events; } }
+
+		public FSMData Data {get; protected set;}
 
 		public IState CurrentState { get; protected set; }
 
@@ -108,14 +113,17 @@ namespace ZSM{
 				ExitState(_newState, args);
 		}
 
-		public void StrtState(string state){
-			if (this.CurrentState == null)
+		public void Strt(string state){
+			if (CurrentState == null)
 				EnterState(state);
 		}
 
-		public FSM() {
+		public FSM() : this(new System.Collections.Generic.Dictionary<string, object>()) {}
+
+		public FSM(System.Collections.Generic.Dictionary<string, object> data) {
 			states = new Dictionary<string, IState>();
 			events = new Dictionary<string, List<DFSMEvent>>();
+			Data = new FSMData(data);
 		}
 
 	}

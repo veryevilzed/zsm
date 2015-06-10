@@ -20,4 +20,7 @@ Global
 		{806D90DC-2324-472E-99CF-7485D0A8BE9D}.Release|x86.ActiveCfg = Release|x86
 		{806D90DC-2324-472E-99CF-7485D0A8BE9D}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Test\Test.csproj
+	EndGlobalSection
 EndGlobal

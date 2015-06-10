@@ -58,7 +58,7 @@ namespace Test {
 			}
 		}
 
-		public static void Main(string[] args) {
+		public static void Main2(string[] args) {
 
 			ZSM.FSM fsm = new ZSM.FSM();
 			fsm.Add(new InitState());
@@ -67,7 +67,7 @@ namespace Test {
 
 			fsm.AddEvents(new EventFromFSM());
 
-			fsm.StrtState("init");
+			fsm.Strt("init");
 
 			fsm.Do("Hello", "World");
 			fsm.Do("Hello", "World");
@@ -75,6 +75,59 @@ namespace Test {
 			fsm.Do("Hello", "World");
 			fsm.Do("Hello", "World");
 			fsm.Do("Hello", "World");
+		}
+
+		static EventManager em = new EventManager();
+
+		public static void DDD(string eventName, object sender, object[] args) {
+			Console.WriteLine("Call event *.*.c from event {0}", eventName);
+		}
+
+
+		public static void Main(string[] _args) {
+		
+//			em.AddEvent("a.b.c", (string eventName, object sender, object[] args) => {
+//				Console.WriteLine("Call event a.b.c from event {0}", eventName);
+//			});
+//
+//			em.AddEvent("a.b.*", (string eventName, object sender, object[] args) => {
+//				Console.WriteLine("Call event a.b.* from event {0}", eventName);
+//			});
+//
+//			em.AddEvent("a.*.*", (string eventName, object sender, object[] args) => {
+//				Console.WriteLine("Call event a.*.* from event {0}", eventName);
+//			});
+//
+//
+//			em.AddEvent("a.*.c", (string eventName, object sender, object[] args) => {
+//				Console.WriteLine("Call event a.*.c from event {0}", eventName);
+//			});
+//
+//			em.AddEvent("a.*", (string eventName, object sender, object[] args) => {
+//				Console.WriteLine("Call event a.* from event {0}", eventName);
+//			});
+
+//			em.AddEvent("a.*.b", (string eventName, object sender, object[] args) => {
+//				Console.WriteLine("Call event a.*.b from event {0}", eventName);
+//			});
+
+			//em.AddEvent("*.*.c", DDD);
+			em.AddEvent("a.b.c", DDD);
+
+			em.AddEvent("a.*", (string eventName, object sender, object[] args) => {
+				Console.WriteLine("Call event a.*.b from event {0}", eventName);
+			});
+
+
+			em.Invoke("a.b.c", null);
+
+			em.RemoveEvent(DDD);
+			Console.WriteLine("-----");
+			em.Invoke("a.b.c", null);
+
+
+
+
 		}
 	}
 }

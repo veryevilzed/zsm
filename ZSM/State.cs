@@ -67,7 +67,6 @@ namespace ZSM {
 		}
 	}
 
-
 	[AttributeUsage(AttributeTargets.Class)]
 	public class StateAttribute : Attribute {
 		public string Name { get; set; }
