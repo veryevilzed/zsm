@@ -58,6 +58,26 @@ namespace Test {
 			}
 		}
 
+		public class Test1 {
+			public string Name { get; set; }
+
+			public override string ToString() {
+				return string.Format("[Test1: Name={0}]", Name);
+			}
+
+			public Test1(string name){
+				this.Name = name;
+			}
+
+			public Test1(int name){
+				this.Name = "INT:"+ name.ToString();
+			}
+
+			public Test1(){
+				this.Name = "default";
+			}
+		}
+
 		public static void Main2(string[] args) {
 
 			ZSM.FSM fsm = new ZSM.FSM();
@@ -91,13 +111,13 @@ namespace Test {
 
 		public static void Main(string[] _args) {
 
-//			ZData data = new ZData();
-//			data.EventManager.AddEvent("change.A", DDD);
-//
-//			data.Set("A", 5);
-//			data.Set("B", 15);
-//			data.Inc("A");
-//			data.Set("A", null);
+			ZData data = new ZData();
+			data.EventManager.AddEvent("change.A", DDD);
+
+			data.Set("A", 5);
+			data.Set("B", 15);
+			data.Inc("A");
+			data.Set("A", null);
 
 			Dictionary<KeyData, string> s = new Dictionary<KeyData, string>();
 			s.Add(new KeyData{ name="a", id = 0 }, "a-0");
@@ -108,7 +128,18 @@ namespace Test {
 			KeyData a1 = new KeyData{name="1", id=2};
 			KeyData a2 = new KeyData{name="1", id=2};
 
+
 			Console.WriteLine("{0}", a1.Equals(a2));
+
+			Test1 t = data.GetOrCreate<Test1>("test", 7);
+			Console.WriteLine(t.ToString());
+			t = data.GetOrCreate<Test1>("test", 14);
+			Console.WriteLine(t.ToString());
+
+
+			data.Set("B", 15);
+			data.Inc("A");
+			data.Set("A", null);
 
 		}
 	}
