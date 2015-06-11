@@ -84,16 +84,31 @@ namespace Test {
 			Console.WriteLine("DataChanged Field:{0} From:{1} To:{2}", args.GetDataEventArgs().Key, args.Before, args.Value);
 		}
 
+		public struct KeyData {
+			public string name;
+			public int id;
+		}
 
 		public static void Main(string[] _args) {
 
-			ZData data = new ZData();
-			data.EventManager.AddEvent("change.A", DDD);
+//			ZData data = new ZData();
+//			data.EventManager.AddEvent("change.A", DDD);
+//
+//			data.Set("A", 5);
+//			data.Set("B", 15);
+//			data.Inc("A");
+//			data.Set("A", null);
 
-			data.Set("A", 5);
-			data.Set("B", 15);
-			data.Inc("A");
-			data.Set("A", null);
+			Dictionary<KeyData, string> s = new Dictionary<KeyData, string>();
+			s.Add(new KeyData{ name="a", id = 0 }, "a-0");
+			s.Add(new KeyData{ name="a", id = 1 }, "a-1");
+
+			Console.WriteLine(s[new KeyData { name="a", id=1}]);
+
+			KeyData a1 = new KeyData{name="1", id=2};
+			KeyData a2 = new KeyData{name="1", id=2};
+
+			Console.WriteLine("{0}", a1.Equals(a2));
 
 		}
 	}
