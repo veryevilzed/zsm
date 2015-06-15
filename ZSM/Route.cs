@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace ZSM {
 	public class Route {
@@ -15,12 +16,30 @@ namespace ZSM {
 		}
 
 		public string Do(params object[] args){
-			return Execute((string)args[0], Utils.Trim(args));
+			return Execute((string)args[0], Utils.RemoveFirst(args));
 		}
 
 		public Route(object target) {
 			this.Target = target;
 		}
+	}
+
+
+	public class EventRouter : Route {
+
+		public object Target {get; protected set;}
+
+		public void MethodFirst(ZEventArgs args) {
+			string[] a = args.EventName.Split('.',1);
+			string name = a[0];
+			this.Execute(name, args.Args);
+		}
+
+		public void MethodFull(ZEventArgs args) {
+			string name = args.EventName.Replace(".","_");
+			this.Execute(name, args.Args);
+		}
+
 	}
 }
 
