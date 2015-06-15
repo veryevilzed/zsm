@@ -108,13 +108,13 @@ namespace Test {
 		public static void Main(string[] _args) {
 
 			ZData data = new ZData();
-			data.EventManager.AddEvent("change.A", DDD);
+			data.EventManager.AddEvent("change.test", DDD);
 
 			Test1 t = data.GetOrCreate<Test1>("test", 7);
 			Console.WriteLine(t.ToString());
-			t = data.GetOrCreate<Test1>("test", 14);
+			t = data.GetOrCreate<Test1>("test");
 			Console.WriteLine(t.ToString());
-
+			data.Set("test", null);
 
 			data.Set("B", 15);
 			data.Inc("A");

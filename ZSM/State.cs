@@ -62,7 +62,7 @@ namespace ZSM {
 		public SmartState(Dictionary<string, object> data) {
 			Data = new ZData(data);
 			route = new Route(this);
-		}
+		} 
 	}
 
 	[AttributeUsage(AttributeTargets.Class)]

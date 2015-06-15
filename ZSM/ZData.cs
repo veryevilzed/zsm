@@ -10,6 +10,9 @@ namespace ZSM {
 		public object Value { get { return Args[1]; } }
 		public object Before { get { return Args[2]; } }
 
+		public ZDataEventArgs(ZData sender, string key, object value, object before, string eventName):base(eventName, sender, key, value, before) {
+		}
+
 		public ZDataEventArgs(ZData sender, string key, object value, object before):base(string.Format("change.{0}", key), sender, key, value, before) {
 		}
 	}
@@ -34,8 +37,9 @@ namespace ZSM {
 				}
 			} else {
 				this.data.Remove(key);
-				if (!silent)
+				if (!silent) {
 					EventManager.Invoke(new ZDataEventArgs(this, key, null, before));
+				}
 			}
 		}
 
@@ -72,8 +76,9 @@ namespace ZSM {
 					return res;
 			}
 			return default(T);
-
 		}
+
+
 
 		public int GetInt(string name){
 			return GetInt(name, 0);
@@ -88,7 +93,7 @@ namespace ZSM {
 		}
 
 		public float GetFloat(string name, float def){
-			return (float)GetFloat(name, def);
+			return (float)Get(name, def);
 		}
 
 		public string GetString(string name){
