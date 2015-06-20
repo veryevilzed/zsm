@@ -85,6 +85,11 @@ namespace ZSM{
 			ExitState(newState, args);
 		}
 
+		public void Update() {
+			if (this.CurrentState != null)
+				this.CurrentState.Update();
+		}
+
 		protected void ExitState(string newState, params object[] args) {
 			if (CurrentState != null) {
 				this.Events.Invoke(new ZFSMEventArgs("fsm.exit", this, StateName));
@@ -107,7 +112,7 @@ namespace ZSM{
 				ExitState(_newState, args);
 		}
 
-		public void Strt(string state){
+		public void Start(string state){
 			if (CurrentState == null)
 				EnterState(state);
 		}

@@ -10,6 +10,15 @@ namespace ZSM {
 		public object Value { get { return Args[1]; } }
 		public object Before { get { return Args[2]; } }
 
+		public T GetValue<T>() {
+			return (T)Value;
+		}
+
+		public T GetBefore<T>() {
+			return (T)Before;
+		}
+
+
 		public ZDataEventArgs(ZData sender, string key, object value, object before, string eventName):base(eventName, sender, key, value, before) {
 		}
 
@@ -31,14 +40,28 @@ namespace ZSM {
 		public void Set(string key, object value, bool silent){
 			object before = this.Get(key);
 			if (value != null) {
+
+				if (data.ContainsKey(key) && data[key] == value)
+					return;
+
 				this.data[key] = value;
+				if (value.GetType() == typeof(IZList)){
+					((IZList)value).Parent = this;
+					((IZList)value).ParentKey = key;
+				}
 				if (!silent){
 					EventManager.Invoke(new ZDataEventArgs(this, key, value, before));
 				}
 			} else {
-				this.data.Remove(key);
-				if (!silent) {
-					EventManager.Invoke(new ZDataEventArgs(this, key, null, before));
+				if (this.data.ContainsKey(key)){
+					if (this.data[key].GetType() == typeof(IZList)){
+						((IZList)this.data[key]).Parent = null;
+						((IZList)this.data[key]).ParentKey = "";
+					}
+					this.data.Remove(key);
+					if (!silent) {
+						EventManager.Invoke(new ZDataEventArgs(this, key, null, before));
+					}
 				}
 			}
 		}
@@ -54,6 +77,19 @@ namespace ZSM {
 				return data[key];
 			return def;
 		}
+
+		public T Get<T>(string key){
+			return Get<T>(key, default(T));
+		}
+
+		public T Get<T>(string key, T def){
+			if (this.data.ContainsKey(key))
+				return (T)this.data[key];
+			else
+				return def;
+		}
+
+
 
 		public void AddChangeFieldEvent(string field, DZEvent listener){
 			this.EventManager.AddEvent(string.Format("change.{0}",field), listener);
@@ -78,7 +114,22 @@ namespace ZSM {
 			return default(T);
 		}
 
+		public ZData GetData(string name){
+			return (ZData)this.Get(name, null);
+		}
 
+		public ZList<T> GetZList<T>(string name){
+			return (ZList<T>)this.Get(name, null);
+		}
+
+
+		public T[] GetArray<T>(string name){
+			return (T[])Get(name, new T[0]);
+		}
+
+		public T[] GetArray<T>(string name, T[] def){
+			return (T[])Get(name, def);
+		}
 
 		public int GetInt(string name){
 			return GetInt(name, 0);
@@ -112,6 +163,28 @@ namespace ZSM {
 			return (bool)Get(name, def);
 		}
 
+		public Type GetKeyType(string name){
+			if (!this.data.ContainsKey(name))
+				return null;
+			return this.data[name].GetType();
+
+		}
+
+		public Type GetKeyType(string name, Type def){
+			if (!this.data.ContainsKey(name))
+				return def;
+			return this.data[name].GetType();
+		}
+
+
+		public long GetLong(string name, long def){
+			if (GetKeyType(name, typeof(int)) == typeof(int))
+				return (long)((int)Get(name, def));
+			return (long)Get(name, def);
+		}
+
+
+
 		public double GetDouble(string name){
 			return GetDouble(name, 0);
 		}
@@ -135,6 +208,11 @@ namespace ZSM {
 			this.Set(name, i + val);
 		}
 
+		public void Inc(string name, long val){
+			long i = GetLong(name, 0);
+			this.Set(name, i + val);
+		}
+
 
 		public void Dec(string name){
 			int i = GetInt(name, 0);
@@ -151,6 +229,11 @@ namespace ZSM {
 			this.Set(name, i - val);
 		}
 
+		public void Dec(string name, long val){
+			long i = GetLong(name, 0);
+			this.Set(name, i - val);
+		}
+
 		#endregion
 
 		public ZData():this(new Dictionary<string, object>()) {
@@ -159,6 +242,12 @@ namespace ZSM {
 		public ZData(Dictionary<string, object> data) {
 			EventManager = new EventManager();
 			this.data = data;
+			foreach(KeyValuePair<string, object> kv in this.data){
+				if (kv.Value != null && typeof(IZList).IsAssignableFrom(kv.Value.GetType())){
+					((IZList)kv.Value).Parent = this;
+					((IZList)kv.Value).ParentKey = kv.Key;
+				}
+			}
 		}
 	}
 }

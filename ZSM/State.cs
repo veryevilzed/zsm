@@ -8,6 +8,7 @@ namespace ZSM {
 		string Enter(params object[] args);
 		string Do(params object[] args);
 		string Exit(params object[] args);
+		void Update();
 	}
 
 	public class State : IState{
@@ -26,6 +27,9 @@ namespace ZSM {
 
 		public virtual string Exit(params object[] args) {
 			return "";
+		}
+
+		public virtual void Update() {
 		}
 
 		public State() {
@@ -55,6 +59,9 @@ namespace ZSM {
 
 		public virtual string Exit(params object[] args) {
 			return "";
+		}
+
+		public virtual void Update() {
 		}
 
 		public SmartState():this(new Dictionary<string, object>()) {}

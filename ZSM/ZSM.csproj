@@ -38,5 +38,6 @@
     <Compile Include="StateResult.cs" />
     <Compile Include="EventManager.cs" />
     <Compile Include="ZData.cs" />
+    <Compile Include="ZList.cs" />
   </ItemGroup>
 </Project>

@@ -18,7 +18,7 @@ namespace ZSM {
 		public ZEventArgs():this("") {}
 		public ZEventArgs(string eventName):this(eventName,null) {}
 
-		public ZEventArgs(string eventName, object sender, params object[] args){
+		public ZEventArgs(string eventName, object sender, params object[] args) {
 			this.EventName = eventName;
 			this.Sender = sender;
 			this.Args = args;
@@ -108,6 +108,8 @@ namespace ZSM {
 
 		private EventTree root;
 
+		public static char EventSeparator = '.';
+
 		public void Invoke(string eventName){
 			this.Invoke(new ZEventArgs(eventName));
 		}
@@ -117,7 +119,7 @@ namespace ZSM {
 		}
 
 		public void Invoke(ZEventArgs args){
-			HashSet<DZEvent> listeners = root.GetListeners(new List<string>(args.EventName.Trim().Split('.')), new HashSet<DZEvent>());
+			HashSet<DZEvent> listeners = root.GetListeners(new List<string>(args.EventName.Trim().Split(EventSeparator)), new HashSet<DZEvent>());
 			foreach(DZEvent listener in listeners){
 				if (listener != null)
 					listener.Invoke(args);
@@ -125,7 +127,7 @@ namespace ZSM {
 		}
 
 		public void AddEvent(string eventName, DZEvent listener){
-			root.AddEvent(new List<string>(eventName.Trim().Split('.')), listener);
+			root.AddEvent(new List<string>(eventName.Trim().Split(EventSeparator)), listener);
 		}
 
 		public void RemoveEvent(DZEvent listener){

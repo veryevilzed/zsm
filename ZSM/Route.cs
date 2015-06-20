@@ -27,17 +27,18 @@ namespace ZSM {
 
 	public class EventRouter : Route {
 
-		public object Target {get; protected set;}
-
 		public void MethodFirst(ZEventArgs args) {
-			string[] a = args.EventName.Split('.',1);
+			string[] a = args.EventName.Split(new char[] {EventManager.EventSeparator}, 1);
 			string name = a[0];
 			this.Execute(name, args.Args);
 		}
 
 		public void MethodFull(ZEventArgs args) {
-			string name = args.EventName.Replace(".","_");
+			string name = args.EventName.Replace(EventManager.EventSeparator.ToString(),"_");
 			this.Execute(name, args.Args);
+		}
+
+		public EventRouter(object target) : base(target) {
 		}
 
 	}
