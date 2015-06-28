@@ -20,6 +20,18 @@ namespace ZSM {
 		public static ZDataEventArgs GetDataEventArgs(this ZEventArgs eventArgs) {
 			return eventArgs.GetEventArgs<ZDataEventArgs>();
 		}
+
+		public static bool IsSimpleType(this object t){
+			Type type = t.GetType();
+			if (type.IsPrimitive || type.Equals(typeof(string)))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	}
 }
 

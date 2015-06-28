@@ -73,8 +73,6 @@ namespace ZSM {
 			}
 
 			public HashSet<DZEvent> GetListeners(List<string> path, HashSet<DZEvent> res) {
-			
-
 
 				if (Leaf == "*" || path.Count == 0)
 					foreach(DZEvent listener in Listeners)
@@ -121,8 +119,18 @@ namespace ZSM {
 		public void Invoke(ZEventArgs args){
 			HashSet<DZEvent> listeners = root.GetListeners(new List<string>(args.EventName.Trim().Split(EventSeparator)), new HashSet<DZEvent>());
 			foreach(DZEvent listener in listeners){
-				if (listener != null)
-					listener.Invoke(args);
+				if (listener != null) {
+
+					if (listener.Method.IsStatic || listener.Target != null){
+						try{
+							listener.Invoke(args);
+						}catch{
+							this.RemoveEvent(listener);
+							//throw new NullReferenceException(string.Format("Listener error {0}, {1}", listener, listener.Target));
+						}
+					}else
+						this.RemoveEvent(listener);
+				}
 			}
 		}
 

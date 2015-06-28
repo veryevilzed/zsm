@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -41,20 +42,19 @@ namespace ZSM {
 			object before = this.Get(key);
 			if (value != null) {
 
-				if (data.ContainsKey(key) && data[key] == value)
+				if (data.ContainsKey(key) && value.IsSimpleType() && data[key] == value)
 					return;
-
 				this.data[key] = value;
-				if (value.GetType() == typeof(IZList)){
+				if (typeof(IZList).IsAssignableFrom(value.GetType())){
 					((IZList)value).Parent = this;
 					((IZList)value).ParentKey = key;
 				}
 				if (!silent){
-					EventManager.Invoke(new ZDataEventArgs(this, key, value, before));
+					this.EventManager.Invoke(new ZDataEventArgs(this, key, value, before));
 				}
 			} else {
 				if (this.data.ContainsKey(key)){
-					if (this.data[key].GetType() == typeof(IZList)){
+					if (typeof(IZList).IsAssignableFrom(value.GetType())){
 						((IZList)this.data[key]).Parent = null;
 						((IZList)this.data[key]).ParentKey = "";
 					}
@@ -119,7 +119,7 @@ namespace ZSM {
 		}
 
 		public ZList<T> GetZList<T>(string name){
-			return (ZList<T>)this.Get(name, null);
+			return (ZList<T>)this.GetOrCreate<ZList<T>>(name);
 		}
 
 
