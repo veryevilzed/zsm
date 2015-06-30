@@ -54,7 +54,7 @@ namespace ZSM {
 				}
 			} else {
 				if (this.data.ContainsKey(key)){
-					if (typeof(IZList).IsAssignableFrom(value.GetType())){
+					if ( typeof(IZList).IsAssignableFrom(this.data[key].GetType())){
 						((IZList)this.data[key]).Parent = null;
 						((IZList)this.data[key]).ParentKey = "";
 					}

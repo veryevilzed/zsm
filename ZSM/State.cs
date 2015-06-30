@@ -8,7 +8,7 @@ namespace ZSM {
 		string Enter(params object[] args);
 		string Do(params object[] args);
 		string Exit(params object[] args);
-		void Update();
+		void Update(float deltaTime);
 	}
 
 	public class State : IState{
@@ -29,7 +29,7 @@ namespace ZSM {
 			return "";
 		}
 
-		public virtual void Update() {
+		public virtual void Update(float deltaTime) {
 		}
 
 		public State() {
@@ -61,7 +61,7 @@ namespace ZSM {
 			return "";
 		}
 
-		public virtual void Update() {
+		public virtual void Update(float deltaTime) {
 		}
 
 		public SmartState():this(new Dictionary<string, object>()) {}

@@ -118,6 +118,10 @@ namespace ZSM {
 
 		public void Invoke(ZEventArgs args){
 			HashSet<DZEvent> listeners = root.GetListeners(new List<string>(args.EventName.Trim().Split(EventSeparator)), new HashSet<DZEvent>());
+			if (listeners.Count == 0)
+				return;
+			ZSMLog.Log.Debug("Found {1} listeners {0}", listeners.Count, args.EventName);
+			System.DateTime dt = DateTime.Now;
 			foreach(DZEvent listener in listeners){
 				if (listener != null) {
 
@@ -132,6 +136,7 @@ namespace ZSM {
 						this.RemoveEvent(listener);
 				}
 			}
+			ZSMLog.Log.Debug("Invoke {1} time {0}", (DateTime.Now - dt).TotalSeconds, args.EventName);
 		}
 
 		public void AddEvent(string eventName, DZEvent listener){
@@ -151,6 +156,12 @@ namespace ZSM {
 			root = new EventTree(null, "", this);
 			support = new Dictionary<DZEvent, List<EventTree>>();
 
+		}
+
+		public override string ToString(){
+
+
+			return string.Format("[EventManager]\n"+root.ToString());
 		}
 	}
 

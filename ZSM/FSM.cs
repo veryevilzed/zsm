@@ -85,9 +85,9 @@ namespace ZSM{
 			ExitState(newState, args);
 		}
 
-		public void Update() {
+		public void Update(float deltaTime) {
 			if (this.CurrentState != null)
-				this.CurrentState.Update();
+				this.CurrentState.Update(deltaTime);
 		}
 
 		protected void ExitState(string newState, params object[] args) {

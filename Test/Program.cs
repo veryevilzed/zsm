@@ -12,14 +12,13 @@ namespace Test {
 			data.EventManager.AddEvent("*", ev);
 			data.AddChangeFieldEvent("test", ch);
 			data.AddChangeFieldEvent("tmp", ch2);
-			//ZList<int> iii=  data.GetZList<int>("test");
-			//Console.WriteLine("{0}", iii);
-			data.Set("tmp", 5555);
-			data.Set("tmp", 6666);
+			ZList<int> iii=  data.GetZList<int>("test");
+			iii.Clear();
+			data.Set("test", null);
 		}
 
 		public static void ch(ZEventArgs args){
-			Console.WriteLine("CHANGED");
+			Console.WriteLine("CHANGED ZList");
 		}
 
 		public static void ch2(ZEventArgs args){
