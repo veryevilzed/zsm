@@ -31,7 +31,7 @@ namespace ZSM {
 			Console.WriteLine(string.Format("[WARN ]"+ format, args));
 		}
 		public void Error(string format, params object[] args){
-			Console.WriteLine(string.Format("[ERROR§]"+ format, args));
+			Console.WriteLine(string.Format("[ERROR]"+ format, args));
 		}
 		#endregion
 	}

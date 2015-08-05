@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -10,7 +11,8 @@ namespace ZSM {
 		public string EventName { get; set; }
 		public object Sender { get; set; }
 		public object[] Args { get; set; }
-
+		public bool Immediately { get;set;}
+		public EventManager Manager {get; set;}
 		public override string ToString(){
 			return string.Format("[ZEventArgs: EventName={0}, Sender={1}, Args={2}]", EventName, Sender, Args);
 		}
@@ -18,93 +20,126 @@ namespace ZSM {
 		public ZEventArgs():this("") {}
 		public ZEventArgs(string eventName):this(eventName,null) {}
 
-		public ZEventArgs(string eventName, object sender, params object[] args) {
+		public ZEventArgs(string eventName, object sender, params object[] args ) {
 			this.EventName = eventName;
 			this.Sender = sender;
 			this.Args = args;
+			this.Immediately = false;
 		}
 	}
 
 	public class EventManager {
 
-		private class EventTree {
-			public string Leaf {get; protected set; }
+//		private class EventTree {
+//			public string Leaf {get; protected set; }
+//			public EventManager Manager {get; protected set;}
+//			public HashSet<DZEvent> Listeners { get; protected set; }
+//			public Dictionary<string, EventTree> Childs { get; protected set; }
+//			public EventTree Parent {get; protected set;}
+//
+//			public void AddEvent(List<string> path, DZEvent listener) {
+//				if (path.Count == 0) {
+//					Listeners.Add(listener);
+//					if (!Manager.support.ContainsKey(listener))
+//						Manager.support.Add(listener, new List<EventTree>());
+//					Manager.support[listener].Add(this);
+//				} else {
+//					string e = path[0];
+//					path.RemoveAt(0);
+//					if (!Childs.ContainsKey(e))
+//						Childs.Add(e, new EventTree(this, e, Manager));
+//
+//					Childs[e].AddEvent(path, listener);
+//				}
+//			}
+//
+//			public void RemoveEvent(DZEvent ev){
+//				this.Listeners.Remove(ev);
+//				if (this.Parent != null && this.Listeners.Count == 0 && this.Childs.Count == 0)
+//					Parent.RemoveEvent(this.Leaf);
+//			}
+//
+//			public void RemoveEvent(string path){
+//				this.Childs.Remove(path);
+//				if (this.Parent != null && this.Listeners.Count == 0 && this.Childs.Count == 0)
+//					Parent.RemoveEvent(this.Leaf);
+//			}
+//
+//			public override string ToString() {
+//				EventTree l = this;
+//				string rr = "";
+//				while(l.Parent != null){
+//					rr = l.Leaf + " - " + rr;
+//					l = l.Parent.ToString();
+//				}
+//				return "Leaf = " + rr;
+//			}
+//
+//			public HashSet<DZEvent> GetListeners(List<string> path, HashSet<DZEvent> res) {
+//
+//				if (Leaf == "*" || path.Count == 0)
+//					foreach(DZEvent listener in Listeners)
+//						res.Add(listener);
+//
+//				if (path.Count == 0)
+//					return res;
+//					
+//				string e = path[0];
+//				path.RemoveAt(0);
+//
+//				if (Childs.ContainsKey(e))
+//					res = Childs[e].GetListeners(new List<string>(path.ToArray()), res);
+//
+//				if (Childs.ContainsKey("*"))
+//					res = Childs["*"].GetListeners(new List<string>(path.ToArray()), res);
+//					
+//				return res;
+//			}
+//
+//			public EventTree(EventTree parent, string leaf, EventManager manager) {
+//				this.Listeners = new HashSet<DZEvent>();
+//				Childs = new Dictionary<string, EventTree>();
+//				this.Parent = parent;
+//				this.Leaf = leaf;
+//				this.Manager = manager;
+//			}
+//		}
+
+		public class EventTree {
 			public EventManager Manager {get; protected set;}
 			public HashSet<DZEvent> Listeners { get; protected set; }
-			public Dictionary<string, EventTree> Childs { get; protected set; }
-			public EventTree Parent {get; protected set;}
-
-			public void AddEvent(List<string> path, DZEvent listener) {
-				if (path.Count == 0) {
-					Listeners.Add(listener);
-					if (!Manager.support.ContainsKey(listener))
-						Manager.support.Add(listener, new List<EventTree>());
-					Manager.support[listener].Add(this);
-				} else {
-					string e = path[0];
-					path.RemoveAt(0);
-					if (!Childs.ContainsKey(e))
-						Childs.Add(e, new EventTree(this, e, Manager));
-
-					Childs[e].AddEvent(path, listener);
-				}
+			public HashSet<DZEvent> GetListeners() {
+				return this.Listeners;
 			}
 
-			public void RemoveEvent(DZEvent ev){
-				this.Listeners.Remove(ev);
-				if (this.Parent != null && this.Listeners.Count == 0 && this.Childs.Count == 0)
-					Parent.RemoveEvent(this.Leaf);
+			public void RemoveEvent(DZEvent e){
+				this.Listeners.Remove(e);
 			}
 
-			public void RemoveEvent(string path){
-				this.Childs.Remove(path);
-				if (this.Parent != null && this.Listeners.Count == 0 && this.Childs.Count == 0)
-					Parent.RemoveEvent(this.Leaf);
-			}
-
-			public override string ToString() {
-				EventTree l = this;
-				string rr = "";
-				while(l.Parent != null){
-					rr = l.Leaf + " - " + rr;
-					l = l.Parent;
-				}
-				return "Leaf = " + rr;
-			}
-
-			public HashSet<DZEvent> GetListeners(List<string> path, HashSet<DZEvent> res) {
-
-				if (Leaf == "*" || path.Count == 0)
-					foreach(DZEvent listener in Listeners)
-						res.Add(listener);
-
-				if (path.Count == 0)
-					return res;
-					
-				string e = path[0];
-				path.RemoveAt(0);
-
-				if (Childs.ContainsKey(e))
-					res = Childs[e].GetListeners(new List<string>(path.ToArray()), res);
-
-				if (Childs.ContainsKey("*"))
-					res = Childs["*"].GetListeners(new List<string>(path.ToArray()), res);
-					
-				return res;
-			}
-
-			public EventTree(EventTree parent, string leaf, EventManager manager) {
+			public EventTree(EventManager parent) {
 				this.Listeners = new HashSet<DZEvent>();
-				Childs = new Dictionary<string, EventTree>();
-				this.Parent = parent;
-				this.Leaf = leaf;
-				this.Manager = manager;
+				this.Manager = parent;
 			}
 		}
 
 		private Dictionary<DZEvent, List<EventTree>> support;
+		private Dictionary<string, EventTree> _events;
 
-		private EventTree root;
+
+		public static Queue eventPool = null;
+		public static int poolStep = 3;
+
+		public static void ApplayPool(int step){
+			if (eventPool.Count == 0)
+				return;
+			for(int i=0;i<step;i++){
+				if (eventPool.Count == 0)
+					break;
+				ZEventArgs o = (ZEventArgs)eventPool.Dequeue();
+				o.Manager.InvokeImmediately(o);
+			}
+		}
+
 
 		public static char EventSeparator = '.';
 
@@ -117,20 +152,33 @@ namespace ZSM {
 		}
 
 		public void Invoke(ZEventArgs args){
-			HashSet<DZEvent> listeners = root.GetListeners(new List<string>(args.EventName.Trim().Split(EventSeparator)), new HashSet<DZEvent>());
+			if (!_events.ContainsKey(args.EventName))
+				return;
+			if (eventPool == null || args.Immediately)
+				InvokeImmediately(args);
+			else{
+				args.Manager = this;
+				eventPool.Enqueue(args);
+			}
+		}
+
+
+		public void InvokeImmediately(ZEventArgs args){
+			if (!_events.ContainsKey(args.EventName))
+				return;
+
+			HashSet<DZEvent> listeners = _events[args.EventName].GetListeners();
+			ZSMLog.Log.Debug("Invoke event:{0} ({1})", args.EventName, listeners.Count);
 			if (listeners.Count == 0)
 				return;
-			ZSMLog.Log.Debug("Found {1} listeners {0}", listeners.Count, args.EventName);
 			System.DateTime dt = DateTime.Now;
 			foreach(DZEvent listener in listeners){
 				if (listener != null) {
-
 					if (listener.Method.IsStatic || listener.Target != null){
 						try{
 							listener.Invoke(args);
 						}catch{
 							this.RemoveEvent(listener);
-							//throw new NullReferenceException(string.Format("Listener error {0}, {1}", listener, listener.Target));
 						}
 					}else
 						this.RemoveEvent(listener);
@@ -140,28 +188,34 @@ namespace ZSM {
 		}
 
 		public void AddEvent(string eventName, DZEvent listener){
-			root.AddEvent(new List<string>(eventName.Trim().Split(EventSeparator)), listener);
+			ZSMLog.Log.Debug("Add event:{0}", eventName);
+			if (this._events.ContainsKey(eventName))
+				this._events[eventName].Listeners.Add(listener);
+			else{
+				EventTree et =  new EventTree(this);
+				et.Listeners.Add(listener);
+				this._events.Add(eventName, et);
+			}
 		}
 
 		public void RemoveEvent(DZEvent listener){
 			if (!this.support.ContainsKey(listener))
 				return;
-
+				
 			foreach(EventTree et in this.support[listener])
 				et.RemoveEvent(listener);
 			this.support.Remove(listener);
 		}
 
 		public EventManager() {
-			root = new EventTree(null, "", this);
+//			root = new EventTree(null, "", this);
 			support = new Dictionary<DZEvent, List<EventTree>>();
+			_events = new Dictionary<string, EventTree>();
 
 		}
 
 		public override string ToString(){
-
-
-			return string.Format("[EventManager]\n"+root.ToString());
+			return string.Format("[EventManager] Keys={0}", _events.Keys.Count);
 		}
 	}
 

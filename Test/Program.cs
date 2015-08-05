@@ -3,31 +3,45 @@ using System.Collections.Generic;
 using ZSM;
 
 namespace Test {
+
+	class StateA :SmartState {
+		public override string Enter(params object[] args){
+			Console.WriteLine("ENTER A");
+			return "";
+		}
+
+		public override string Exit(params object[] args){
+			Console.WriteLine("EXIT A");
+			return "";
+		}
+	}
+
+	class StateB :SmartState {
+		public override string Enter(params object[] args){
+			Console.WriteLine("ENTER B");
+			return "";
+		}
+
+		public override string Exit(params object[] args){
+			Console.WriteLine("EXIT B");
+			return "";
+		}
+
+	}
+
 	class MainClass {
 
+		static FSM f;
 
 		public static void Main(string[] _args) {
-
-			ZData data = new ZData();
-			data.EventManager.AddEvent("*", ev);
-			data.AddChangeFieldEvent("test", ch);
-			data.AddChangeFieldEvent("tmp", ch2);
-			ZList<int> iii=  data.GetZList<int>("test");
-			iii.Clear();
-			data.Set("test", null);
+			f = new FSM();
+			f.Add(new StateA());
+			f.Add(new StateB());
+			f.Start("StateA");
+			Console.ReadKey();
+			f.ChangeState("StateB");
 		}
 
-		public static void ch(ZEventArgs args){
-			Console.WriteLine("CHANGED ZList");
-		}
-
-		public static void ch2(ZEventArgs args){
-			Console.WriteLine("CHANGED TMP");
-		}
-
-		public static void ev(ZEventArgs args){
-			Console.WriteLine("e:{0}",args.EventName);
-		}
 
 
 	}

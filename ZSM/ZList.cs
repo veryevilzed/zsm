@@ -40,24 +40,26 @@ namespace ZSM {
 
 		#endregion
 
-		public void Add(T value){
+
+
+		public void Add(T value, bool silent = false){
 			data.Add(value);
-			OnParentEvent();
+			if (!silent) OnParentEvent();
 		}
 
-		public void Remove(T value){
+		public void Remove(T value, bool silent = false){
 			data.Remove(value);
-			OnParentEvent();
+			if (!silent) OnParentEvent();
 		}
 
-		public void RemoveAt(int index){
+		public void RemoveAt(int index, bool silent = false){
 			data.RemoveAt(index);
-			OnParentEvent();
+			if (!silent) OnParentEvent();
 		}
 
-		public void Clear(){
+		public void Clear(bool silent = false){
 			data.Clear();
-			OnParentEvent();
+			if (!silent) OnParentEvent();
 		}
 
 		public T[] ToArray() {
@@ -79,14 +81,15 @@ namespace ZSM {
 //			return data.GetEnumerator();
 //		}
 //
-		public void AddRange(IEnumerable<T> values){
+		public void AddRange(IEnumerable<T> values, bool silent = false){
 			data.AddRange(values);
-			OnParentEvent();
+			if (!silent) OnParentEvent();
+
 		}
 
-		public void RemoveAll(Predicate<T> match) {
+		public void RemoveAll(Predicate<T> match, bool silent = false) {
 			this.data.RemoveAll(match);
-			OnParentEvent();
+			if (!silent) OnParentEvent();
 		}
 
 		public bool Exists(Predicate<T> match) {

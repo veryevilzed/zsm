@@ -100,7 +100,6 @@ namespace ZSM{
 				else 
 					EnterState(newState, args);
 			}
-				
 		}
 
 		protected void EnterState(string newState, params object[] args) {
