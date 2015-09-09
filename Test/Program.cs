@@ -33,13 +33,25 @@ namespace Test {
 
 		static FSM f;
 
+		static void test(ZEventArgs arg){
+			Console.WriteLine(" --- *** TEST *** ---");
+		}
+
 		public static void Main(string[] _args) {
-			f = new FSM();
-			f.Add(new StateA());
-			f.Add(new StateB());
-			f.Start("StateA");
-			Console.ReadKey();
-			f.ChangeState("StateB");
+//			f = new FSM();
+//			f.Add(new StateA());
+//			f.Add(new StateB());
+//			f.Start("StateA");
+//			Console.ReadKey();
+//			f.ChangeState("StateB");
+
+			EventManager em = new EventManager();
+			em.AddEvent("test", test);
+			em.Invoke("test");
+
+			em.RemoveEvent(test);
+			em.Invoke("test");
+
 		}
 
 

@@ -193,18 +193,23 @@ namespace ZSM {
 				this._events[eventName].Listeners.Add(listener);
 				if (this.support.ContainsKey(listener))
 					this.support[listener].Add(this._events[eventName]);
+				else
+					this.support.Add(listener, new List<EventTree>(new EventTree[]{ this._events[eventName] }));
 		    }else{
 				EventTree et =  new EventTree(this);
 				et.Listeners.Add(listener);
 				this._events.Add(eventName, et);
 				if (this.support.ContainsKey(listener))
 					this.support[listener].Add(et);
+				else
+					this.support.Add(listener, new List<EventTree>(new EventTree[]{ et }));
 			}
 		}
 
 		public void RemoveEvent(DZEvent listener){
-			if (!this.support.ContainsKey(listener))
+			if (!this.support.ContainsKey(listener)){
 				return;
+			}
 				
 			foreach(EventTree et in this.support[listener])
 				et.RemoveEvent(listener);
