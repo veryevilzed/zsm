@@ -189,12 +189,16 @@ namespace ZSM {
 
 		public void AddEvent(string eventName, DZEvent listener){
 			ZSMLog.Log.Debug("Add event:{0}", eventName);
-			if (this._events.ContainsKey(eventName))
+			if (this._events.ContainsKey(eventName)){
 				this._events[eventName].Listeners.Add(listener);
-			else{
+				if (this.support.ContainsKey(listener))
+					this.support[listener].Add(this._events[eventName]);
+		    }else{
 				EventTree et =  new EventTree(this);
 				et.Listeners.Add(listener);
 				this._events.Add(eventName, et);
+				if (this.support.ContainsKey(listener))
+					this.support[listener].Add(et);
 			}
 		}
 
