@@ -67,10 +67,16 @@ namespace ZSM{
 			this.Events.Invoke(new ZEventArgs(eventName, this, args));
 		}
 
+		public void SendEvent(string eventName, params object[] args){
+			this.Do(eventName, new ZEventArgs(eventName, this, args));
+		}
+
 		public void Add(string name, IState state) {
 			state.Parent = this;
 			this.States.Add(name, state);
 		}
+
+
 
 		public virtual void Do(params object[] args){
 			if (CurrentState == null)

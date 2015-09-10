@@ -207,6 +207,7 @@ namespace ZSM {
 		}
 
 		public void RemoveEvent(DZEvent listener){
+			return;
 			if (!this.support.ContainsKey(listener)){
 				return;
 			}
