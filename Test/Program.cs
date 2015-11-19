@@ -31,30 +31,18 @@ namespace Test {
 
 	class MainClass {
 
-		static FSM f;
+		static EventManager em;
 
 		static void test(ZEventArgs arg){
 			Console.WriteLine(" --- *** TEST *** ---");
+			em.RemoveEvent(test);
 		}
 
 		public static void Main(string[] _args) {
-//			f = new FSM();
-//			f.Add(new StateA());
-//			f.Add(new StateB());
-//			f.Start("StateA");
-//			Console.ReadKey();
-//			f.ChangeState("StateB");
-
-			EventManager em = new EventManager();
+			em = new EventManager();
 			em.AddEvent("test", test);
 			em.Invoke("test");
-
-			em.RemoveEvent(test);
 			em.Invoke("test");
-
 		}
-
-
-
 	}
 }

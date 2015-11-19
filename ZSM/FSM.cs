@@ -68,7 +68,7 @@ namespace ZSM{
 		}
 
 		public void SendEvent(string eventName, params object[] args){
-			this.Do(eventName, new ZEventArgs(eventName, this, args));
+			this.Do("events", eventName, new ZEventArgs(eventName, this, args));
 		}
 
 		public void Add(string name, IState state) {

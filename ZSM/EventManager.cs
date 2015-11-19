@@ -166,10 +166,12 @@ namespace ZSM {
 		public void InvokeImmediately(ZEventArgs args){
 			if (!_events.ContainsKey(args.EventName))
 				return;
-
-			HashSet<DZEvent> listeners = _events[args.EventName].GetListeners();
-			ZSMLog.Log.Debug("Invoke event:{0} ({1})", args.EventName, listeners.Count);
-			if (listeners.Count == 0)
+			HashSet<DZEvent> _listeners = _events[args.EventName].GetListeners();
+			DZEvent[] listeners = new DZEvent[_listeners.Count];
+			_listeners.CopyTo(listeners);
+			if (listeners.Length > 15)
+				ZSMLog.Log.Warn("Invoke event:{0} ({1})", args.EventName, listeners.Length);
+			if (listeners.Length == 0)
 				return;
 			System.DateTime dt = DateTime.Now;
 			foreach(DZEvent listener in listeners){
@@ -184,7 +186,8 @@ namespace ZSM {
 						this.RemoveEvent(listener);
 				}
 			}
-			ZSMLog.Log.Debug("Invoke {1} time {0}", (DateTime.Now - dt).TotalSeconds, args.EventName);
+			if ((DateTime.Now - dt).TotalSeconds > 1.0f)
+				ZSMLog.Log.Warn("Invoke {1} time {0}", (DateTime.Now - dt).TotalSeconds, args.EventName);
 		}
 
 		public void AddEvent(string eventName, DZEvent listener){
@@ -207,7 +210,7 @@ namespace ZSM {
 		}
 
 		public void RemoveEvent(DZEvent listener){
-			return;
+
 			if (!this.support.ContainsKey(listener)){
 				return;
 			}
