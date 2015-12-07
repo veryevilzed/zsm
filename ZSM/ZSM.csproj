@@ -40,5 +40,6 @@
     <Compile Include="ZData.cs" />
     <Compile Include="ZList.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="LoadingCache.cs" />
   </ItemGroup>
 </Project>

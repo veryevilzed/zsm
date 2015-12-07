@@ -39,10 +39,30 @@ namespace Test {
 		}
 
 		public static void Main(string[] _args) {
-			em = new EventManager();
-			em.AddEvent("test", test);
-			em.Invoke("test");
-			em.Invoke("test");
+//			em = new EventManager();
+//			em.AddEvent("test", test);
+//			em.Invoke("test");
+//			em.Invoke("test");
+
+			LoadingCache c = new LoadingCache();
+			c.LifeTime = 1;
+
+			c.New = delegate(string key) {
+				return 5;
+			};
+
+			c.Destroy = delegate(string key) {
+				return true;
+			};
+
+//			c.Refresh = delegate(string key) {
+//				return 6;
+//			};
+
+			Console.WriteLine("{0}", c["test"]);
+			System.Threading.Thread.Sleep(1001);
+			Console.WriteLine("{0}", c["test"]);
+
 		}
 	}
 }
