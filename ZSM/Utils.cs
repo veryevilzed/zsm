@@ -23,14 +23,7 @@ namespace ZSM {
 
 		public static bool IsSimpleType(this object t){
 			Type type = t.GetType();
-			if (type.IsPrimitive || type.Equals(typeof(string)))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return type.IsPrimitive || type.Equals(typeof(string));
 		}
 	}
 }

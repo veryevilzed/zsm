@@ -93,13 +93,13 @@ namespace ZSM{
 
 		public void Update(float deltaTime) {
 			if (this.CurrentState != null)
-				this.CurrentState.Update(deltaTime);
+				this.CurrentState.doUpdate(deltaTime);
 		}
 
 		protected void ExitState(string newState, params object[] args) {
 			if (CurrentState != null) {
 				this.Events.Invoke(new ZFSMEventArgs("fsm.exit", this, StateName));
-				string _newState = CurrentState.Exit(args);
+				string _newState = CurrentState.doExit(args);
 				CurrentState = null;
 				if (_newState != "")
 					EnterState(_newState, args);
@@ -112,7 +112,7 @@ namespace ZSM{
 			StateName = newState;
 			CurrentState = States[newState];
 			this.Events.Invoke(new ZFSMEventArgs("fsm.enter", this, StateName));
-			string _newState = CurrentState.Enter(args);
+			string _newState = CurrentState.doEnter(args);
 			if (_newState != "")
 				ExitState(_newState, args);
 		}
