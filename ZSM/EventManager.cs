@@ -218,6 +218,8 @@ namespace ZSM {
 			foreach(EventTree et in this.support[listener])
 				et.RemoveEvent(listener);
 			this.support.Remove(listener);
+
+			ZSMLog.Log.Debug("Remove event:{0}", listener.Method.Name);
 		}
 
 		public EventManager() {

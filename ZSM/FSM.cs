@@ -110,6 +110,8 @@ namespace ZSM{
 
 		protected void EnterState(string newState, params object[] args) {
 			StateName = newState;
+			if (!States.ContainsKey(newState))
+				throw new KeyNotFoundException(string.Format("The given key({0}) was not present in the dictionary",newState));
 			CurrentState = States[newState];
 			this.Events.Invoke(new ZFSMEventArgs("fsm.enter", this, StateName));
 			string _newState = CurrentState.Enter(args);
