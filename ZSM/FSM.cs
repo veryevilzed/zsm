@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace ZSM{
 
@@ -38,7 +39,6 @@ namespace ZSM{
 					return;
 				}
 			}
-
 			this.Add(state.GetType().Name, state);
 		}
 
@@ -53,6 +53,10 @@ namespace ZSM{
 					}
 				}
 			}
+		}
+
+		public void Signal(params object[] args){
+			this.Do((object[])(new object[] { "signal" }).Concat(args));
 		}
 
 		public void AddEvent(string eventName, DZEvent listener){
