@@ -56,7 +56,7 @@ namespace ZSM{
 		}
 
 		public void Signal(params object[] args){
-			this.Do((object[])(new object[] { "signal" }).Concat(args));
+			this._Do(Utils.AddFirst("signal", args));
 		}
 
 		public void AddEvent(string eventName, DZEvent listener){
@@ -83,6 +83,15 @@ namespace ZSM{
 
 
 		public virtual void Do(params object[] args){
+			if (CurrentState == null)
+				return;
+
+			string newState = CurrentState.Do(args);
+			if (newState != "")
+				ExitState(newState, args);
+		}
+
+		private void _Do(object[] args){
 			if (CurrentState == null)
 				return;
 
