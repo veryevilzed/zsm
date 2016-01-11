@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace ZSM{
 
@@ -38,7 +39,6 @@ namespace ZSM{
 					return;
 				}
 			}
-
 			this.Add(state.GetType().Name, state);
 		}
 
@@ -53,6 +53,10 @@ namespace ZSM{
 					}
 				}
 			}
+		}
+
+		public void Signal(params object[] args){
+			this._Do(Utils.AddFirst("signal", args));
 		}
 
 		public void AddEvent(string eventName, DZEvent listener){
@@ -87,19 +91,28 @@ namespace ZSM{
 				ExitState(newState, args);
 		}
 
+		private void _Do(object[] args){
+			if (CurrentState == null)
+				return;
+
+			string newState = CurrentState.Do(args);
+			if (newState != "")
+				ExitState(newState, args);
+		}
+
 		public virtual void ChangeState(string newState, params object[] args){
 			ExitState(newState, args);
 		}
 
 		public void Update(float deltaTime) {
 			if (this.CurrentState != null)
-				this.CurrentState.Update(deltaTime);
+				this.CurrentState.doUpdate(deltaTime);
 		}
 
 		protected void ExitState(string newState, params object[] args) {
 			if (CurrentState != null) {
 				this.Events.Invoke(new ZFSMEventArgs("fsm.exit", this, StateName));
-				string _newState = CurrentState.Exit(args);
+				string _newState = CurrentState.doExit(args);
 				CurrentState = null;
 				if (_newState != "")
 					EnterState(_newState, args);
@@ -114,7 +127,7 @@ namespace ZSM{
 				throw new KeyNotFoundException(string.Format("The given key({0}) was not present in the dictionary",newState));
 			CurrentState = States[newState];
 			this.Events.Invoke(new ZFSMEventArgs("fsm.enter", this, StateName));
-			string _newState = CurrentState.Enter(args);
+			string _newState = CurrentState.doEnter(args);
 			if (_newState != "")
 				ExitState(_newState, args);
 		}

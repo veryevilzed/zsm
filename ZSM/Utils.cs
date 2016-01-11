@@ -11,6 +11,16 @@ namespace ZSM {
 			return a;
 		}
 
+		public static object[] AddFirst(object obj, object[] arg){
+			if (arg.Length == 0)
+				return new object[] { obj };
+
+			object[] a = new object[arg.Length + 1];
+			a[0] = obj;
+			Array.Copy(arg, 0, a, 1, arg.Length);
+			return a;
+		}
+
 		public static T GetEventArgs<T>(this ZEventArgs eventArgs) {
 			if (eventArgs.GetType() == typeof(T))
 				return (T)(object)eventArgs;
@@ -21,16 +31,9 @@ namespace ZSM {
 			return eventArgs.GetEventArgs<ZDataEventArgs>();
 		}
 
-		public static bool IsSimpleType(this object t){
+		public static bool IsSimpleType(this object t) {
 			Type type = t.GetType();
-			if (type.IsPrimitive || type.Equals(typeof(string)))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return type.IsPrimitive || type.Equals(typeof(string));
 		}
 	}
 }
