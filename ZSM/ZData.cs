@@ -95,6 +95,10 @@ namespace ZSM {
 			this.EventManager.AddEvent(string.Format("change.{0}",field), listener);
 		}
 
+		public void AddChangeFieldAction(string field, Action listener){
+			this.EventManager.AddAction(string.Format("change.{0}",field), listener);
+		}
+
 		#region helper
 
 		public T GetOrCreate<T>(string name, params object[] createArgs) {

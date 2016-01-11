@@ -108,21 +108,28 @@ namespace ZSM {
 		public class EventTree {
 			public EventManager Manager {get; protected set;}
 			public HashSet<DZEvent> Listeners { get; protected set; }
-			public HashSet<DZEvent> GetListeners() {
-				return this.Listeners;
-			}
+			public HashSet<DZEvent> GetListeners() { return this.Listeners; }
+
+			public HashSet<Action> Listeners2 { get; protected set; }
+			public HashSet<Action> GetListeners2() { return this.Listeners2; }
 
 			public void RemoveEvent(DZEvent e){
 				this.Listeners.Remove(e);
 			}
 
+			public void RemoveAction(Action e){
+				this.Listeners2.Remove(e);
+			}
+
 			public EventTree(EventManager parent) {
 				this.Listeners = new HashSet<DZEvent>();
+				this.Listeners2 = new HashSet<Action>();
 				this.Manager = parent;
 			}
 		}
 
 		private Dictionary<DZEvent, List<EventTree>> support;
+		private Dictionary<Action, List<EventTree>> support2;
 		private Dictionary<string, EventTree> _events;
 
 
@@ -167,12 +174,16 @@ namespace ZSM {
 			if (!_events.ContainsKey(args.EventName))
 				return;
 			HashSet<DZEvent> _listeners = _events[args.EventName].GetListeners();
+			HashSet<Action> _listeners2 = _events[args.EventName].GetListeners2();
 			DZEvent[] listeners = new DZEvent[_listeners.Count];
 			_listeners.CopyTo(listeners);
-			if (listeners.Length > 15)
-				ZSMLog.Log.Warn("Invoke event:{0} ({1})", args.EventName, listeners.Length);
-			if (listeners.Length == 0)
+			Action[] listeners2 = new Action[_listeners2.Count];
+			_listeners2.CopyTo(listeners2);
+			if (listeners.Length + listeners2.Length > 15 )
+				ZSMLog.Log.Warn("Invoke event:{0} ({1})", args.EventName, listeners.Length + listeners2.Length);
+			if (listeners.Length + listeners2.Length == 0)
 				return;
+
 			System.DateTime dt = DateTime.Now;
 			foreach(DZEvent listener in listeners){
 				if (listener != null) {
@@ -186,6 +197,20 @@ namespace ZSM {
 						this.RemoveEvent(listener);
 				}
 			}
+
+			foreach(Action listener in listeners2){
+				if (listener != null) {
+					if (listener.Method.IsStatic || listener.Target != null){
+						try{
+							listener.Invoke();
+						}catch{
+							this.RemoveAction(listener);
+						}
+					}else
+						this.RemoveAction(listener);
+				}
+			}
+
 			if ((DateTime.Now - dt).TotalSeconds > 1.0f)
 				ZSMLog.Log.Warn("Invoke {1} time {0}", (DateTime.Now - dt).TotalSeconds, args.EventName);
 		}
@@ -209,6 +234,26 @@ namespace ZSM {
 			}
 		}
 
+		public void AddAction(string eventName, Action listener){
+			ZSMLog.Log.Debug("Add event:{0}", eventName);
+			if (this._events.ContainsKey(eventName)){
+				this._events[eventName].Listeners2.Add(listener);
+				if (this.support2.ContainsKey(listener))
+					this.support2[listener].Add(this._events[eventName]);
+				else
+					this.support2.Add(listener, new List<EventTree>(new EventTree[]{ this._events[eventName] }));
+			}else{
+				EventTree et =  new EventTree(this);
+				et.Listeners2.Add(listener);
+				this._events.Add(eventName, et);
+				if (this.support2.ContainsKey(listener))
+					this.support2[listener].Add(et);
+				else
+					this.support2.Add(listener, new List<EventTree>(new EventTree[]{ et }));
+			}
+		}
+
+
 		public void RemoveEvent(DZEvent listener){
 
 			if (!this.support.ContainsKey(listener)){
@@ -222,9 +267,23 @@ namespace ZSM {
 			ZSMLog.Log.Debug("Remove event:{0}", listener.Method.Name);
 		}
 
+		public void RemoveAction(Action listener){
+
+			if (!this.support2.ContainsKey(listener)){
+				return;
+			}
+
+			foreach(EventTree et in this.support2[listener])
+				et.RemoveAction(listener);
+			this.support2.Remove(listener);
+
+			ZSMLog.Log.Debug("Remove event:{0}", listener.Method.Name);
+		}
+
 		public EventManager() {
 //			root = new EventTree(null, "", this);
 			support = new Dictionary<DZEvent, List<EventTree>>();
+			support2 = new Dictionary<Action, List<EventTree>>();
 			_events = new Dictionary<string, EventTree>();
 
 		}
