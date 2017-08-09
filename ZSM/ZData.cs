@@ -72,10 +72,9 @@ namespace ZSM {
 			return Get(key, null);
 		}
 
-		public object Get(string key, object def){
-			if (this.data.ContainsKey(key))
-				return data[key];
-			return def;
+		public object Get(string key, object def)
+		{
+			return this.data.ContainsKey(key) ? data[key] : def;
 		}
 
 		public T Get<T>(string key){
@@ -139,8 +138,11 @@ namespace ZSM {
 			return GetInt(name, 0);
 		}
 
-		public int GetInt(string name, int def){
-			return (int)Get(name, def);
+		
+		
+		public int GetInt(string name, int def)
+		{
+			return AdapterInt(Get<object>(name, def));
 		}
 
 		public float GetFloat(string name){
@@ -148,7 +150,7 @@ namespace ZSM {
 		}
 
 		public float GetFloat(string name, float def){
-			return (float)Get(name, def);
+			return Get(name, def);
 		}
 
 		public string GetString(string name){
@@ -156,7 +158,7 @@ namespace ZSM {
 		}
 
 		public string GetString(string name, string def){
-			return (string)Get(name, def);
+			return Get(name, def);
 		}
 
 		public bool GetBool(string name){
@@ -164,30 +166,28 @@ namespace ZSM {
 		}
 
 		public bool GetBool(string name, bool def){
-			return (bool)Get(name, def);
+			return Get(name, def);
 		}
 
-		public Type GetKeyType(string name){
-			if (!this.data.ContainsKey(name))
-				return null;
-			return this.data[name].GetType();
-
+		public Type GetKeyType(string name)
+		{
+			return !data.ContainsKey(name) ? null : data[name].GetType();
 		}
 
-		public Type GetKeyType(string name, Type def){
-			if (!this.data.ContainsKey(name))
-				return def;
-			return this.data[name].GetType();
+		public Type GetKeyType(string name, Type def)
+		{
+			return !data.ContainsKey(name) ? def : data[name].GetType();
 		}
 
-
-		public long GetLong(string name, long def){
-			if (GetKeyType(name, typeof(int)) == typeof(int))
-				return (long)((int)Get(name, def));
-			return (long)Get(name, def);
+		public long GetLong(string name)
+		{
+			return GetLong(name, 0L);
 		}
-
-
+		
+		public long GetLong(string name, long def)
+		{
+			return AdapterLong(Get<object>(name, def));
+		}
 
 		public double GetDouble(string name){
 			return GetDouble(name, 0);
@@ -198,43 +198,43 @@ namespace ZSM {
 		}
 
 		public void Inc(string name){
-			int i = GetInt(name, 0);
+			var i = GetInt(name, 0);
 			this.Set(name, i + 1);
 		}
 
 		public void Inc(string name, int val){
-			int i = GetInt(name, 0);
+			var i = GetInt(name, 0);
 			this.Set(name, i + val);
 		}
 
 		public void Inc(string name, float val){
-			float i = GetFloat(name, 0);
+			var i = GetFloat(name, 0);
 			this.Set(name, i + val);
 		}
 
 		public void Inc(string name, long val){
-			long i = GetLong(name, 0);
+			var i = GetLong(name, 0);
 			this.Set(name, i + val);
 		}
 
 
 		public void Dec(string name){
-			int i = GetInt(name, 0);
+			var i = GetInt(name, 0);
 			this.Set(name, i - 1);
 		}
 
 		public void Dec(string name, int val){
-			int i = GetInt(name, 0);
+			var i = GetInt(name, 0);
 			this.Set(name, i - val);
 		}
 
 		public void Dec(string name, float val){
-			float i = GetFloat(name, 0);
+			var i = GetFloat(name, 0);
 			this.Set(name, i - val);
 		}
 
 		public void Dec(string name, long val){
-			long i = GetLong(name, 0);
+			var i = GetLong(name, 0);
 			this.Set(name, i - val);
 		}
 
@@ -246,12 +246,33 @@ namespace ZSM {
 		public ZData(Dictionary<string, object> data) {
 			EventManager = new EventManager();
 			this.data = data;
-			foreach(KeyValuePair<string, object> kv in this.data){
-				if (kv.Value != null && typeof(IZList).IsAssignableFrom(kv.Value.GetType())){
-					((IZList)kv.Value).Parent = this;
-					((IZList)kv.Value).ParentKey = kv.Key;
-				}
+			foreach(var kv in this.data){
+				if (!(kv.Value is IZList)) continue;
+				((IZList)kv.Value).Parent = this;
+				((IZList)kv.Value).ParentKey = kv.Key;
 			}
+		}
+		
+		private static int AdapterInt(object maybe)
+		{
+			if (maybe is int)
+				return (int) maybe;
+
+			if (maybe is long || maybe is byte || maybe is uint || maybe is ulong)
+				return Convert.ToInt32(maybe);
+			
+			throw new InvalidCastException("value type is "+maybe.GetType().Name);
+		}
+		
+		private static long AdapterLong(object maybe)
+		{
+			if (maybe is long)
+				return (long)maybe;
+
+			if (maybe is int || maybe is byte || maybe is uint || maybe is ulong)
+				return Convert.ToInt64(maybe);
+			
+			throw new InvalidCastException("value type is "+maybe.GetType().Name);
 		}
 	}
 }

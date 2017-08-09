@@ -79,8 +79,9 @@ namespace ZSM {
 			if (enable && obj != null){
 				currentTime += deltaTime;
 				if(currentTime>=resetTime){
-					currentTime -= resetTime;
+					//currentTime -= resetTime;
 					mi.Invoke(obj, new object[0]);
+					currentTime = 0;
 					if (!loop)
 						enable = false;
 				}
