@@ -14,19 +14,48 @@ namespace ZSM {
 		string doEnter(params object[] args);
 		string doExit(params object[] args);
 		void doUpdate(float deltaTime);
-
+		string NextState(string key);
 	}
 
 	public class State : IState{
 
-		public string doEnter(params object[] args) { return this.Enter(args); }
-		public string doExit(params object[] args) { return this.Exit(args); }
+		public string doEnter(params object[] args)
+		{
+			BeforeEnter(args);
+			var res =  Enter(args);
+			AfterEnter(args);
+			return res;
+		}
+
+		public string doExit(params object[] args)
+		{
+			BeforeExit(args);
+			var res =  Exit(args);
+			AfterExit(args);
+			return res;
+		}
 		public void doUpdate(float deltaTime) { this.Update(deltaTime); }
 
 		public FSM Parent { get; set; }
 
 		public ZData Data { get; protected set; }
+		
+		public virtual Dictionary<string, string> NextStateCollection { get { return new Dictionary<string, string>(); } }
 
+		public virtual string NextState(string key)
+		{
+			return NextStateCollection.ContainsKey(key) ? NextStateCollection[key] : key;
+		}
+
+		public virtual void BeforeEnter(params object[] args)
+		{
+		}
+
+		public virtual void AfterEnter(params object[] args)
+		{
+		}
+
+		
 		public virtual string Enter(params object[] args) {
 			return "";
 		}
@@ -35,6 +64,16 @@ namespace ZSM {
 			return "";
 		}
 
+		
+		public virtual void BeforeExit(params object[] args)
+		{
+		}
+
+		public virtual void AfterExit(params object[] args)
+		{
+		}
+
+		
 		public virtual string Exit(params object[] args) {
 			return "";
 		}
@@ -59,9 +98,33 @@ namespace ZSM {
 		public Dictionary<string, Timing> Timers { get { return timings; } }
 
 		private Route route;
+		
 		public FSM Parent {get; set; }
 		public ZData Data { get; protected set; }
 
+		public virtual void BeforeEnter(params object[] args)
+		{
+		}
+
+		public virtual void AfterEnter(params object[] args)
+		{
+		}
+		
+		public virtual void BeforeExit(params object[] args)
+		{
+		}
+
+		public virtual void AfterExit(params object[] args)
+		{
+		}
+		
+		public virtual Dictionary<string, string> NextStateCollection { get { return new Dictionary<string, string>(); } }
+
+		public virtual string NextState(string key)
+		{
+			return NextStateCollection.ContainsKey(key) ? NextStateCollection[key] : key;
+		}
+		
 		public virtual string Enter(params object[] args) {
 			return "";
 		}
@@ -79,15 +142,23 @@ namespace ZSM {
 		public virtual void Update(float deltaTime) {
 		}
 
-		public string doEnter(params object[] args) { 
+		public string doEnter(params object[] args)
+		{
 			ResetAllTimers();
-			return this.Enter(args); 
+			BeforeEnter(args);
+			var res =   Enter(args);
+			AfterEnter(args);
+			return res;
 		}
 
-		public string doExit(params object[] args) { 
-			return this.Exit(args); 
+		public string doExit(params object[] args)
+		{
+			BeforeExit(args);
+			var res =  Exit(args);
+			AfterExit(args);
+			return res;
 		}
-
+		
 		public void doUpdate(float deltaTime) { 
 			UpdateAllTimers(deltaTime);
 			this.Update(deltaTime); 

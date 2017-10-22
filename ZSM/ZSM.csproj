@@ -32,6 +32,8 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <Compile Include="Async\Timeout.cs" />
+    <Compile Include="Async\ZTask.cs" />
     <Compile Include="FSM.cs" />
     <Compile Include="Route.cs" />
     <Compile Include="Utils.cs" />
